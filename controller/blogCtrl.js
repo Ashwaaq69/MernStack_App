@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Blog = require("../models/blogModal");
+const Blog = require("../models/blogModel"); 
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const validateMongoDbId = require("../utils/validateMongodbId");
@@ -70,84 +70,57 @@ const deleteBlog = asyncHandler(async (req, res) => {
 });
 
 // Like blog
-// const likeBlog = asyncHandler(async (req, res) => {
-//     const { blogId } = req.body;
-//     validateMongoDbId(blogId);
-    
-//     // find the blog which you want to be liked
-//     const blog = await Blog.findById(blogId);
-    
-//     // find the login user
-//     const loginUserId = req?.user?._id;
-    
-//     // find if the user has liked the blog
-//     const isLiked = blog?.isLiked;
-    
-//     // find if the user has disliked the blog
-//     const alreadyDisliked = blog?.dislikes?.find(userId => userId.toString() === loginUserId.toString());
-
-//     if (alreadyDisliked) {
-//         const updatedBlog = await Blog.findByIdAndUpdate(blogId, {
-//             $pull: { dislikes: loginUserId },
-//             isDisliked: false
-//         }, { new: true });
-//         return res.json(updatedBlog);
-//     }
-
-//     if (isLiked) {
-//         const updatedBlog = await Blog.findByIdAndUpdate(blogId, {
-//             $pull: { likes: loginUserId },
-//             isLiked: false
-//         }, { new: true });
-//         return res.json(updatedBlog);
-//     } 
-
-//     const updatedBlog = await Blog.findByIdAndUpdate(blogId, {
-//         $push: { likes: loginUserId },
-//         isLiked: true
-//     }, { new: true });
-
-//     res.json(updatedBlog);
-// }); 
-
 const likeBlog = asyncHandler(async (req, res) => {
-    const { postId } = req.body;  // Ensure you are using the correct key
-    if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
-        return res.status(400).json({ message: "Invalid post ID" });
-    }
+    const { blogId } = req.body;
+    validateMongoDbId(blogId); // Validate the blogId
     
-    validateMongoDbId(postId);  // This should not throw an error if ID is valid
-
-    const blog = await Blog.findById(postId);
+    // Find the blog which you want to be liked
+    const blog = await Blog.findById(blogId);
+    
+    // Check if blog exists
     if (!blog) {
-        return res.status(404).json({ message: "Blog post not found" });
+        return res.status(404).json({ message: "Blog not found" });
     }
 
+    // Find the logged-in user
     const loginUserId = req?.user?._id;
+    
+    // Check if the blog has been liked
     const isLiked = blog?.isLiked;
+    
+    // Check if the user has disliked the blog
     const alreadyDisliked = blog?.dislikes?.find(userId => userId.toString() === loginUserId.toString());
 
     if (alreadyDisliked) {
-        await Blog.findByIdAndUpdate(postId, {
+        // Remove dislike if user has already disliked the blog
+        const updatedBlog = await Blog.findByIdAndUpdate(blogId, {
             $pull: { dislikes: loginUserId },
             isDisliked: false
-        }, { new: true });
+        }, {
+            new: true
+        });
+        return res.json(updatedBlog);  // Return the updated blog
     }
 
     if (isLiked) {
-        await Blog.findByIdAndUpdate(postId, {
+        // If the blog is already liked, remove the like
+        const updatedBlog = await Blog.findByIdAndUpdate(blogId, {
             $pull: { likes: loginUserId },
             isLiked: false
-        }, { new: true });
+        }, {
+            new: true
+        });
+        return res.json(updatedBlog);  // Return the updated blog
     } else {
-        await Blog.findByIdAndUpdate(postId, {
+        // If not liked yet, add a like
+        const updatedBlog = await Blog.findByIdAndUpdate(blogId, {
             $push: { likes: loginUserId },
             isLiked: true
-        }, { new: true });
+        }, {
+            new: true
+        });
+        return res.json(updatedBlog);  // Return the updated blog
     }
-
-    res.json({ message: "Blog like status updated successfully" });
 });
-
 
 module.exports = { createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog };

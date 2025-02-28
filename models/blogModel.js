@@ -1,4 +1,4 @@
-const mongoose = require('mongoose'); // Erase if already required
+const mongoose = require('mongoose');
 
 // Declare the Schema of the Mongo model
 var BlogSchema = new mongoose.Schema({
@@ -34,7 +34,6 @@ var BlogSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     }],
-   
     images: {
         type: String,
         default: "https://imgs.search.brave.com/v7R6966q2cIUqcIBZTnMl1HDf3h8Yfy5wBnNmy0fq-k/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9ub3RlYm9vay13/aXRoLWJsb2ctd29y/ZC1jb21wdXRlci1k/ZXNrXzEwNDE2NS0x/OS5qcGc_c2VtdD1h/aXNfaHlicmlk"
