@@ -8,7 +8,7 @@ router.put('/:id', authMiddleware, isAdmin, updateBlog);
 router.delete('/:id', authMiddleware, isAdmin, deleteBlog);
 router.get('/:id', getBlog);
 router.get('/', getAllBlogs);
-router.put('/likes/:id', authMiddleware, isAdmin, likeBlog);
+router.put('/likes/:id', authMiddleware, likeBlog);
 
 
 
