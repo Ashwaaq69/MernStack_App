@@ -33,11 +33,11 @@ const getBlog = asyncHandler(async (req, res) => {
     validateMongoDbId(id);
 
     try {
-        const blog = await Blog.findByIdAndUpdate(id, { $inc: { numViews: 1 } }, { new: true });
-        if (!blog) {
-            return res.status(404).json({ message: "Blog not found" });
-        }
-        res.json(blog);
+        const getBlog = await Blog.findById(id).populate("likes").populate("dislikes");
+        const updateViews = await Blog.findByIdAndUpdate(id, { $inc: { numViews: 1 } },
+            { new: true });
+        
+        res.json(getBlog);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -78,9 +78,9 @@ const likeBlog = asyncHandler(async (req, res) => {
     const blog = await Blog.findById(blogId);
     
     // Check if blog exists
-    if (!blog) {
-        return res.status(404).json({ message: "Blog not found" });
-    }
+    // if (!blog) {
+    //     return res.status(404).json({ message: "Blog not found" });
+    // }
 
     // Find the logged-in user
     const loginUserId = req?.user?._id;
@@ -89,38 +89,109 @@ const likeBlog = asyncHandler(async (req, res) => {
     const isLiked = blog?.isLiked;
     
     // Check if the user has disliked the blog
-    const alreadyDisliked = blog?.dislikes?.find(userId => userId.toString() === loginUserId.toString());
+    const alreadyDisliked = blog?.dislikes?.find(
+        (userId) => userId?.toString() === loginUserId?.toString()
+    );
 
-    if (alreadyDisliked) {
-        // Remove dislike if user has already disliked the blog
-        const updatedBlog = await Blog.findByIdAndUpdate(blogId, {
-            $pull: { dislikes: loginUserId },
-            isDisliked: false
-        }, {
-            new: true
-        });
-        return res.json(updatedBlog);  // Return the updated blog
+    if(alreadyDisliked) {
+        const blog = await Blog.findByIdAndUpdate(
+            blogId,
+            {
+            $pull: { disLikes: loginUserId},
+            isDisLiked:false,
+        },{ new: true});
+        res.json(blog);
+    };
+    if (isLiked) {
+        const blog = await Blog.findByIdAndUpdate(
+          blogId,
+          {
+            $pull: { likes: loginUserId },
+            isLiked: false,
+          },
+          { new: true }
+        );
+        res.json(blog);
+      } else {
+        const blog = await Blog.findByIdAndUpdate(
+          blogId,
+          {
+            $push: { likes: loginUserId },
+            isLiked: true,
+          },
+          { new: true }
+        );
+        res.json(blog);
+      }
+
+})
+
+
+// dislike blog 
+
+const dislikeBlog = asyncHandler(async (req, res) => {
+    const { blogId } = req.body;
+    validateMongoDbId(blogId); // Validate the blogId
+    
+    // Find the blog which you want to be disliked
+    const blog = await Blog.findById(blogId);
+    
+    // Check if blog exists
+    if (!blog) {
+        return res.status(404).json({ message: "Blog not found" });
     }
 
-    if (isLiked) {
-        // If the blog is already liked, remove the like
-        const updatedBlog = await Blog.findByIdAndUpdate(blogId, {
-            $pull: { likes: loginUserId },
-            isLiked: false
-        }, {
-            new: true
-        });
-        return res.json(updatedBlog);  // Return the updated blog
+    // Find the logged-in user
+    const loginUserId = req?.user?._id;
+    
+    // Check if the blog has been disliked
+    const isDisliked = blog?.isDisliked;
+    
+    // Check if the user has liked the blog
+    const alreadyLiked = blog?.likes?.find(
+        (userId) => userId?.toString() === loginUserId?.toString()
+    );
+
+    if (alreadyLiked) {
+        // Remove like if user has already liked the blog
+        const updatedBlog = await Blog.findByIdAndUpdate(
+            blogId,
+            {
+                $pull: { likes: loginUserId },
+                isLiked: false,
+            },
+            { new: true }
+        );
+        res.json(updatedBlog);
+    }
+
+    if (isDisliked) {
+        // If the blog is already disliked, remove the dislike
+        const updatedBlog = await Blog.findByIdAndUpdate(
+            blogId,
+            {
+                $pull: { dislikes: loginUserId },
+                isDisliked: false,
+            },
+            { new: true }
+        );
+        res.json(updatedBlog);
     } else {
-        // If not liked yet, add a like
-        const updatedBlog = await Blog.findByIdAndUpdate(blogId, {
-            $push: { likes: loginUserId },
-            isLiked: true
-        }, {
-            new: true
-        });
-        return res.json(updatedBlog);  // Return the updated blog
+        // If not disliked yet, add a dislike
+        const updatedBlog = await Blog.findByIdAndUpdate(
+            blogId,
+            {
+                $push: { dislikes: loginUserId },
+                isDisliked: true,
+            },
+            { new: true }
+        );
+        res.json(updatedBlog);
     }
 });
 
-module.exports = { createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog };
+
+
+module.exports = { createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog, dislikeBlog };
+
+
