@@ -10,6 +10,8 @@ const authRouter = require("./routes/authRoute");
 const productRouter = require("./routes/productRoute"); 
 const blogRouter = require("./routes/blogRoute");
 categoryRouter = require("./routes/prodcategoryRoute")
+blogcategoryRouter = require ("./routes/blogCatRoute");
+const brandRouter = require("./routes/brandRoute")
 const cookieParser = require('cookie-parser');
 const morgan = require("morgan")
 dbConnect();
@@ -24,6 +26,8 @@ app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
 app.use("/api/category", categoryRouter);
+app.use("/api/blogcategory", blogcategoryRouter);
+app.use("/api/brand", brandRouter);
 
 app.use(notFound);
 app.use(errorHandler);
