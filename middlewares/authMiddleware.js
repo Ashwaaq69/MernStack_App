@@ -35,6 +35,7 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
     }
 });
 
+
 // check if is Admin
 const isAdmin =  asyncHandler(async (req, res, next)=>{
     const {email} = req.user;
