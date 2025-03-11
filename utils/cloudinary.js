@@ -36,3 +36,10 @@ cloudinary.config({
         throw new Error(`Cloudinary Deletion Error: ${error.message}`);
     }
  }
+
+module.exports = {
+    cloudinaryUploadImage,
+    cloudinaryDeleteImage,
+};
+ 
+//  Now, we will use the above utility functions in our controller to upload and delete the image. 
