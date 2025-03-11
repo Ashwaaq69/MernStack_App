@@ -1,11 +1,12 @@
-const  multer =  require ("multer");
-const { CloudinaryStorage } = require ("multer-storage-cloudinary");
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const sharp = require("sharp");
-const { v2 as cloudinary }= require("cloudinary");
+const cloudinary = require("cloudinary").v2;
+
 
 const cloudinaryStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params:{
+  params: {
     folder: "e-uploads",
     format: async () => "jpeg",
     public_id: (req, file) => file.originalname.split(".")[0],
@@ -16,22 +17,20 @@ const cloudinaryStorage = new CloudinaryStorage({
 const storage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
-  if(file.mimetype.startsWith("image")) {
+  if (file.mimetype.startsWith("image")) {
     cb(null, true);
-  }else {
-    cb(new Error("Unsupported file  format"), false);
+  } else {
+    cb(new Error("Unsupported file format"), false);
   }
 };
 
-
-const upload = multer({
+const uploadPhoto = multer({
   storage,
   fileFilter: multerFilter,
-  limits: { fileSize: 4000000, files: 5}, // limit to files, 4MB each
+  limits: { fileSize: 2000000, files: 5 }, // limit to 5 files, 2MB each
 });
 
-// Image Resizing Middleware ( if needed after upload)
-
+// Image Resizing Middleware (if needed after upload)
 const resizeAndUploadImage = async (req, res, next) => {
   if (!req.files) return next();
 
@@ -71,14 +70,14 @@ const resizeAndUploadImage = async (req, res, next) => {
       })
     );
 
-    res.json({ urls });
+    req.body.images = urls.map(url => url.url); // Add the URLs to the request body
+    next();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 module.exports = {
-    upload,
-    resizeAndUploadImage,
-    
+  uploadPhoto,
+  resizeAndUploadImage,
 };
