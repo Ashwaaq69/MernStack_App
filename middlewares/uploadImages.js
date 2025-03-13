@@ -33,20 +33,48 @@ const uploadPhoto = multer({
 });
 
 
+// const productImgResize = async (req, res, next) => {
+//   if (!req.files) return next(); // Skip if no files
+
+//   try {
+//     await Promise.all(
+//       req.files.map(async (file) => {
+//         const outputPath = `public/images/products/${file.filename}`;
+
+//         // Resize and save the image
+//         await sharp(file.path)
+//           .resize(300, 300)
+//           .toFormat('jpeg')
+//           .jpeg({ quality: 90 })
+//           .toFile(outputPath);
+
+//         // Delete the original file after processing
+//         // fs.unlinkSync(file.path); // ✅ Ensure old file is deleted inside the loop
+//       })
+//     );
+
+//     next(); // Pass control to the next middleware
+//   } catch (error) {
+//     console.error('Error processing images:', error);
+//     res.status(500).send('Error processing images');
+//   }
+// };
+
+
 const productImgResize = async (req, res, next) => {
   if (!req.files) return next(); // Skip if no files
 
   try {
     await Promise.all(
       req.files.map(async (file) => {
-        const outputPath = `public/images/products/${file.filename}`;
-
+      
         // Resize and save the image
         await sharp(file.path)
           .resize(300, 300)
           .toFormat('jpeg')
           .jpeg({ quality: 90 })
-          .toFile(outputPath);
+          .toFile(`public/images/products/${file.filename}`);
+          fs.unlinkSync(`public/images/products/${file.filename}`)
 
         // Delete the original file after processing
         // fs.unlinkSync(file.path); // ✅ Ensure old file is deleted inside the loop
@@ -73,5 +101,8 @@ const blogImgResize = async (req, res, next) => {
   );
   next();
 };
+
+
+
 
 module.exports = { uploadPhoto, productImgResize, blogImgResize };

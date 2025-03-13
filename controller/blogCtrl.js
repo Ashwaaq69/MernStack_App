@@ -4,6 +4,7 @@ const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const validateMongoDbId = require("../utils/validateMongodbId");
 const { cloudinaryUploadImage } = require("../utils/cloudinary");
+const fs = require("fs")
 
 // Create blog
 const createBlog = asyncHandler(async (req, res) => {
@@ -192,7 +193,40 @@ const dislikeBlog = asyncHandler(async (req, res) => {
 });
 
 
+// const uploadImages = asyncHandler(async (req, res) => {
+//     const { id } = req.params;
+//     validateMongoDbId(id);
+
+//     try {
+//         const uploader = (path) => cloudinaryUploadImage(path, "images");
+//         const urls = [];
+//         const files = req.files;
+        
+
+//         for (const file of files) {
+//             const { path } = file; // Extract path correctly
+//             const newPath = await uploader(path);
+//             urls.push(newPath);
+//             console.log(file);
+//             // fs.unlinkSync(path)
+//         }
+
+//         const findBlog = await Blog.findByIdAndUpdate(
+//             id,
+//             { images: urls },
+//             { new: true }
+//         );
+
+//         res.json(findBlog);
+//     } catch (error) {
+//         res.status(500).json({ message: "Cloudinary upload failed", error: error.message });
+//     }
+// });
+
+
 const uploadImages = asyncHandler(async (req, res) => {
+    console.log("Files received:", req.files); // Debugging line
+
     const { id } = req.params;
     validateMongoDbId(id);
 
@@ -200,14 +234,17 @@ const uploadImages = asyncHandler(async (req, res) => {
         const uploader = (path) => cloudinaryUploadImage(path, "images");
         const urls = [];
         const files = req.files;
-        
+
+        if (!files || files.length === 0) {
+            return res.status(400).json({ message: "No files received for upload" });
+        }
 
         for (const file of files) {
-            const { path } = file; // Extract path correctly
+            const { path } = file;
             const newPath = await uploader(path);
             urls.push(newPath);
-            console.log(file);
-            // fs.unlinkSync(path)
+            console.log("Uploaded to Cloudinary:", newPath);
+            fs.unlinkSync(path);
         }
 
         const findBlog = await Blog.findByIdAndUpdate(
@@ -221,8 +258,6 @@ const uploadImages = asyncHandler(async (req, res) => {
         res.status(500).json({ message: "Cloudinary upload failed", error: error.message });
     }
 });
-
-
 
 
 module.exports = { createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog, dislikeBlog,
