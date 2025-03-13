@@ -3,6 +3,7 @@ const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const validateMongoDbId = require("../utils/validateMongodbId");
 const slugify = require("slugify");
+const {cloudinaryUploadImage} = require ("../utils/cloudinary");
 
 const createProduct = asyncHandler(async (req, res) => {
     if (req.body.title) {
@@ -204,9 +205,46 @@ const rating = asyncHandler(async (req, res) => {
     }
 });
 
-const uploadImages = asyncHandler(async (req, res) =>{
-    console.log(req.files)
+const uploadImages = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    validateMongoDbId(id);
 
-})
+    try {
+        const uploader = (path) => cloudinaryUploadImage(path, "images");
+        const urls = [];
+        const files = req.files;
 
-module.exports = { createProduct, getaProduct, getAllproduct, updateProduct, deleteProduct, addWishlist, rating, uploadImages }; 
+        for (const file of files) {
+            const { path } = file; // Extract path correctly
+            const newPath = await uploader(path);
+            urls.push(newPath);
+            console.log(file);
+            // fs.unlinkSync(path)
+        }
+
+        const findProduct = await Product.findByIdAndUpdate(
+            id,
+            { images: urls },
+            { new: true }
+        );
+
+        res.json(findProduct); // Correct variable name
+    } catch (error) {
+        res.status(500).json({ message: "Cloudinary upload failed", error: error.message });
+    }
+});
+
+
+module.exports = {
+    createProduct,
+    getaProduct,
+    getAllproduct,
+    updateProduct,
+    deleteProduct,
+    addWishlist,
+    rating,
+    uploadImages
+};
+
+
+

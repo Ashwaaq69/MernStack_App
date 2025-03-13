@@ -3,6 +3,7 @@ const Blog = require("../models/blogModel");
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const validateMongoDbId = require("../utils/validateMongodbId");
+const { cloudinaryUploadImage } = require("../utils/cloudinary");
 
 // Create blog
 const createBlog = asyncHandler(async (req, res) => {
@@ -191,7 +192,38 @@ const dislikeBlog = asyncHandler(async (req, res) => {
 });
 
 
+const uploadImages = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    validateMongoDbId(id);
 
-module.exports = { createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog, dislikeBlog };
+    try {
+        const uploader = (path) => cloudinaryUploadImage(path, "images");
+        const urls = [];
+        const files = req.files;
+
+        for (const file of files) {
+            const { path } = file; // Extract path correctly
+            const newPath = await uploader(path);
+            urls.push(newPath);
+            console.log(file);
+            // fs.unlinkSync(path)
+        }
+
+        const findBlog = await Blog.findByIdAndUpdate(
+            id,
+            { images: urls },
+            { new: true }
+        );
+
+        res.json(findBlog);
+    } catch (error) {
+        res.status(500).json({ message: "Cloudinary upload failed", error: error.message });
+    }
+});
+
+
+
+
+module.exports = { createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog, dislikeBlog,uploadImages };
 
 

@@ -1,7 +1,7 @@
 const cloudinary = require ("cloudinary");
 
 cloudinary.config({
-    cloud_name: 'codewithAshuu',
+    cloud_name: 'codewithmoha',
     api_key: '265961574972223',
     api_secret: '56KKVODbrT27n9ly2YqKFKTCkn8',
   });

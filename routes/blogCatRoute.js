@@ -5,12 +5,14 @@ const {
     deleteCategory,
     getacategory,
     getallcategory,
-    updateCategory 
+    updateCategory,
+    
 } = require("../controller/blogCatCtrl.js");
+const { uploadPhoto, productImgResize } = require("../middlewares/uploadImages");
 
 const Router = express.Router();
 
-Router.post("/", authMiddleware, isAdmin, createCategory);
+
 Router.put("/:id", authMiddleware, isAdmin, updateCategory);
 Router.get("/:id", authMiddleware, isAdmin, getacategory);
 Router.get("/", authMiddleware, isAdmin, getallcategory);
