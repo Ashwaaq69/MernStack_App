@@ -200,6 +200,7 @@ const uploadImages = asyncHandler(async (req, res) => {
         const uploader = (path) => cloudinaryUploadImage(path, "images");
         const urls = [];
         const files = req.files;
+        
 
         for (const file of files) {
             const { path } = file; // Extract path correctly
@@ -224,6 +225,8 @@ const uploadImages = asyncHandler(async (req, res) => {
 
 
 
-module.exports = { createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog, dislikeBlog,uploadImages };
+module.exports = { createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog, dislikeBlog,
+    uploadImages
+     };
 
 

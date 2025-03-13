@@ -1,5 +1,4 @@
 
-
 const multer = require("multer");
 const sharp = require("sharp");
 const path = require("path");
@@ -50,7 +49,7 @@ const productImgResize = async (req, res, next) => {
           .toFile(outputPath);
 
         // Delete the original file after processing
-        fs.unlinkSync(file.path); // ✅ Ensure old file is deleted inside the loop
+        // fs.unlinkSync(file.path); // ✅ Ensure old file is deleted inside the loop
       })
     );
 

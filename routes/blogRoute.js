@@ -1,11 +1,12 @@
 const express = require("express");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
-const {createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog, dislikeBlog, uploadImages } = require("../controller/blogCtrl");
+const {createBlog, updateBlog, deleteBlog, getBlog, getAllBlogs, likeBlog, dislikeBlog,
+  uploadImages
+   } = require("../controller/blogCtrl");
 const { uploadPhoto, productImgResize } = require("../middlewares/uploadImages");
 const router = express.Router();
 
 router.post('/', authMiddleware, isAdmin, createBlog);
-// router.post("/", authMiddleware, isAdmin, createCategory);
 router.put(
     "/upload/:id",
     authMiddleware,
