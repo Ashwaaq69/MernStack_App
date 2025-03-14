@@ -33,7 +33,7 @@ router.get("/:id", getaProduct);
 router.get("/", getAllproduct);
 router.put("/:id", authMiddleware, isAdmin, updateProduct);
 router.delete("/:id", authMiddleware, isAdmin, deleteProduct);
-router.put("/wishlist/:id", authMiddleware, addWishlist);
+router.put("/wishlist", authMiddleware, addWishlist);
 router.put("/rating/:id", authMiddleware, rating);
 
 module.exports = router;

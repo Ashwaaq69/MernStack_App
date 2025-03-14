@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const Product = require('../models/productModel');
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require('../config/jwtToken');
 const ValidateMongoDbId = require("../utils/validateMongodbId");
@@ -46,6 +47,44 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
         throw new Error('Invalid credentials');
     }
 });
+
+//login admin 
+const loginAdmin = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const findAdmin = await User.findOne({ email });
+        if (!findAdmin) return res.status(400).json({ message: "Invalid Email please provide a valid email" });
+        if (findAdmin.role !== 'admin') return res.status(401).json({ message: "Unauthorized" });
+
+        const isCorrectPassword = await findAdmin.isPasswordMatched(password);
+        if (!isCorrectPassword) return res.status(400).json({ message: "Incorrect password" });
+
+        const refreshToken = await generateRefreshToken(findAdmin._id);
+        const updateUser = await User.findByIdAndUpdate(findAdmin.id, {
+            refreshToken: refreshToken,
+        }, {
+            new: true
+        });
+        updateUser.save();
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        });
+        res.json({
+            _id: findAdmin._id,
+            firstname: findAdmin.firstname,
+            lastname: findAdmin.lastname,
+            email: findAdmin.email,
+            mobile: findAdmin.mobile,
+            token: generateToken(findAdmin._id),
+            refreshToken: refreshToken
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 // handle refresh token
 const handleRefreshToken = asyncHandler(async (req, res) => {
@@ -102,6 +141,23 @@ const updateaUser = asyncHandler(async (req, res) => {
         throw new Error(error);
     }
 });
+
+// save address user
+const saveUserAddress = asyncHandler(async (req,res, next) => {
+    const {id} = req.user;
+    ValidateMongoDbId(id);
+    try {
+        const updateuser = await User.findByIdAndUpdate(id, {
+            address: req?.body.address,
+        },{
+            new:true,
+        })
+    
+        res.json(updateuser)
+    } catch (error) {
+        throw new Error(error)
+    }
+})
 
 // Get all users
 const getallUser = asyncHandler(async (req, res) => {
@@ -226,6 +282,22 @@ const resetPassword = asyncHandler(async (req, res) => {
     res.json(user);
 });
 
+// get wishlist
+
+const getWishlist = asyncHandler(async (req, res) => {
+    const {_id} = req.user;
+    // console.log("User ID from req.user:", _id);
+    // ValidateMongoDbId(_id);
+
+    try {
+        const findUser = await User.findById(_id).populate("wishlist");
+        res.json(findUser);
+    } catch (error) {
+        throw new Error(error)
+    }
+})
+
+
 
 module.exports = {
     createUser,
@@ -240,5 +312,8 @@ module.exports = {
     logout,
     updatePassword,
     forgotPasswordToken,
-    resetPassword
+    resetPassword,
+    loginAdmin,
+    getWishlist,
+    saveUserAddress
 };
