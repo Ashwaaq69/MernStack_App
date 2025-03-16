@@ -17,4 +17,4 @@ router.get("/:id", authMiddleware, isAdmin, getaColor);
 router.delete("/:id", authMiddleware, isAdmin, deleteColor);
 
 
-export default router;
+module.exports = router;
