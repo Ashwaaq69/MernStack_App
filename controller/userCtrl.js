@@ -1,13 +1,14 @@
 const User = require('../models/userModel');
 const Product = require('../models/productModel');
 const Cart = require('../models/cartModel');
-const Coupon = require('../models/couponModel')
+const Coupon = require('../models/couponModel');
+const Order = require('../models/orderModel');
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require('../config/jwtToken');
 const ValidateMongoDbId = require("../utils/validateMongodbId");
 const { generateRefreshToken } = require("../config/refreshtoken");
 const jwt = require("jsonwebtoken");
-const sendEmail = require("./emailCtrl")
+const sendEmail = require("./emailCtrl");
 const crypto = require('crypto');
 
 
@@ -508,7 +509,7 @@ const createOrder = asyncHandler(async (req, res) => {
   });
   
   
-  // get singlr order
+  // get asingle order
 
   const getSingleOrder = asyncHandler( async (req,res) => {
       const { id } = req.params;
@@ -523,15 +524,20 @@ const createOrder = asyncHandler(async (req, res) => {
   })
 
   // get all orders
-  const getAllOrder = asyncHandler( async (req,res) => {
-      try {
-          const userOrders = await Order.find().populate("products.product").populate("orderby").exec();
-          console.log("[ORDERS_GET]" + userOrders);
-          res.json(userOrders);
-      } catch (error) {
-          throw new Error(error)
-      }
+  
+const getAllOrder = asyncHandler(async (req, res) => {
+    try {
+      const userOrders = await Order.find()
+        .populate("products.product")
+        .populate("orderby")
+        .exec();
+      res.json(userOrders);
+    } catch (error) {
+      throw new Error(error);
+    }
   });
+
+
   
   // get order items
 const getOrderStatusEnum = (req, res) => {
