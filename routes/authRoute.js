@@ -40,8 +40,8 @@ router.get("/logout", logout);
 router.get("/wishlist", authMiddleware, getWishlist )
 router.get("/:id", authMiddleware, isAdmin, getaUser)
 router.delete("/:id", deleteaUser)
+// router.delete("/empty-cart/:id", authMiddleware, emptyCart);
 router.delete("/empty-cart", authMiddleware , emptyCart);
-
 router.put("/edit-user", authMiddleware, updateaUser)
 router.put("/save-adress", authMiddleware, saveUserAddress )
 router.put("/block-user/:id", authMiddleware, isAdmin, blockUser)

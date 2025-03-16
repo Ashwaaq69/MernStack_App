@@ -384,8 +384,11 @@ const getUserCart = asyncHandler( async (req,res) => {
     }
 });
 
+// empty cart
 const emptyCart = asyncHandler(async (req,res) => {
     const {_id} = req.user;
+    ValidateMongoDbId(_id);
+   
 
     try {
         const user = await User.findById(_id);
@@ -395,6 +398,9 @@ const emptyCart = asyncHandler(async (req,res) => {
         throw new Error(error)
     }
 });
+
+
+
 
 const applyCoupon = asyncHandler( async (req,res) => {
     const { coupon } = req.body;
