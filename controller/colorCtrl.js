@@ -12,7 +12,7 @@ const createColor = asyncHandler( async (req,res) => {
     }
 });
 
-export const updateColor = asyncHandler( async (req,res) => {
+const updateColor = asyncHandler( async (req,res) => {
     const {id} = req.params;
     validateMongoDbId(id);
 
@@ -27,7 +27,7 @@ export const updateColor = asyncHandler( async (req,res) => {
     }
 });
 
-export const getaColor = asyncHandler( async (req,res) => {
+const getaColor = asyncHandler( async (req,res) => {
     const {id} = req.params;
     validateMongoDbId(id)
     try {
@@ -39,7 +39,7 @@ export const getaColor = asyncHandler( async (req,res) => {
 
 });
 
-export const getallColor = asyncHandler(async (req,res) => {
+ const getallColor = asyncHandler(async (req,res) => {
     try {
         const color = await  Color.find();
         res.json(color);
@@ -48,7 +48,7 @@ export const getallColor = asyncHandler(async (req,res) => {
     }
 });
 
-export const deleteColor = asyncHandler( async (req,res) => {
+const deleteColor = asyncHandler( async (req,res) => {
     const {id} = req.params;
     validateMongoDbId(id);
 

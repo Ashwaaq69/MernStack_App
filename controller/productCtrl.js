@@ -236,13 +236,13 @@ const rating = asyncHandler(async (req, res) => {
 
 
 const uploadImages = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    validateMongoDbId(id);
+    // const { id } = req.params;
+    // validateMongoDbId(id);
 
     try {
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ message: "No files uploaded" });
-        }
+        // if (!req.files || req.files.length === 0) {
+        //     return res.status(400).json({ message: "No files uploaded" });
+        // }
 
         const uploader = (path) => cloudinaryUploadImage(path, "images");
         const urls = [];
@@ -252,14 +252,12 @@ const uploadImages = asyncHandler(async (req, res) => {
             const newPath = await uploader(path);
             urls.push(newPath);
         }
+        const images = urls.map((file) =>{
+            return false
+        })
+        res.json(images)
 
-        const findProduct = await Product.findByIdAndUpdate(
-            id,
-            { images: urls },
-            { new: true }
-        );
-
-        res.json(findProduct);
+        
     } catch (error) {
         res.status(500).json({ message: "Cloudinary upload failed", error: error.message });
     }
