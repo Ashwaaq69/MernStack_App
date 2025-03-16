@@ -71,4 +71,4 @@ var productSchema = new mongoose.Schema({
 
 
 //Export the model
-module.exports = mongoose.model('product', productSchema);
+module.exports = mongoose.model('Product', productSchema);
