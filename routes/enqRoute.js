@@ -10,7 +10,7 @@ const {
 
 const router = express.Router();
 
-router.post("/create", authMiddleware, isAdmin,  createEnquiry);
+router.post("/", authMiddleware, isAdmin,  createEnquiry);
 router.get("/", authMiddleware, isAdmin, getallEnquiry);
 router.put("/:id", authMiddleware, isAdmin,  updateEnquiry);
 router.get("/:id", authMiddleware, isAdmin, getaEnquiry);
