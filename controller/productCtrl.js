@@ -3,7 +3,9 @@ const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const validateMongoDbId = require("../utils/validateMongodbId");
 const slugify = require("slugify");
-const {cloudinaryUploadImage} = require ("../utils/cloudinary");
+const fs = require("fs");
+const {cloudinaryUploadImage, cloudinaryDeleteImage}  = require ("../utils/cloudinary");
+
 
 const createProduct = asyncHandler(async (req, res) => {
     if (req.body.title) {
@@ -205,45 +207,12 @@ const rating = asyncHandler(async (req, res) => {
     }
 });
 
-// const uploadImages = asyncHandler(async (req, res) => {
-//     const { id } = req.params;
-//     validateMongoDbId(id);
-
-//     try {
-//         const uploader = (path) => cloudinaryUploadImage(path, "images");
-//         const urls = [];
-//         const files = req.files;
-
-//         for (const file of files) {
-//             const { path } = file; // Extract path correctly
-//             const newPath = await uploader(path);
-//             urls.push(newPath);
-//             console.log(file);
-//             // fs.unlinkSync(path)
-//         }
-
-//         const findProduct = await Product.findByIdAndUpdate(
-//             id,
-//             { images: urls },
-//             { new: true }
-//         );
-
-//         res.json(findProduct); // Correct variable name
-//     } catch (error) {
-//         res.status(500).json({ message: "Cloudinary upload failed", error: error.message });
-//     }
-// });
 
 
 const uploadImages = asyncHandler(async (req, res) => {
-    // const { id } = req.params;
-    // validateMongoDbId(id);
-
+   
     try {
-        // if (!req.files || req.files.length === 0) {
-        //     return res.status(400).json({ message: "No files uploaded" });
-        // }
-
+       
         const uploader = (path) => cloudinaryUploadImage(path, "images");
         const urls = [];
 
@@ -264,6 +233,22 @@ const uploadImages = asyncHandler(async (req, res) => {
 });
 
 
+// delete images
+
+
+const deleteImages = asyncHandler(async (req, res) => {
+    const {id} = req.params;
+    
+    try {
+       
+        const deleter = cloudinaryDeleteImage(id, "images");
+           res.json({message: "Deleted"})
+    } catch (error) {
+        res.status(500).json({ message: "Cloudinary upload failed", error: error.message });
+    }
+});
+
+
 module.exports = {
     createProduct,
     getaProduct,
@@ -272,7 +257,8 @@ module.exports = {
     deleteProduct,
     addWishlist,
     rating,
-    uploadImages
+    uploadImages,
+    deleteImages
 };
 
 

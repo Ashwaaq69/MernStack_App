@@ -9,7 +9,8 @@ const {
   deleteProduct,
   addWishlist,
   rating,
-  uploadImages
+  uploadImages,
+  deleteImages
 } = require("../controller/productCtrl");
 
 const { uploadPhoto, productImgResize } = require("../middlewares/uploadImages");
@@ -20,7 +21,7 @@ router.post("/", authMiddleware, isAdmin, createProduct);
 
 // Fixed route with final handler
 router.put(
-  "/upload/:id",
+  "/upload",
   authMiddleware,
   isAdmin,
   uploadPhoto.array("images", 10),
@@ -33,6 +34,7 @@ router.get("/:id", getaProduct);
 router.get("/", getAllproduct);
 router.put("/:id", authMiddleware, isAdmin, updateProduct);
 router.delete("/:id", authMiddleware, isAdmin, deleteProduct);
+router.delete("/delete-img/:id", authMiddleware, isAdmin, deleteImages);
 router.put("/wishlist", authMiddleware, addWishlist);
 router.put("/rating/:id", authMiddleware, rating);
 
